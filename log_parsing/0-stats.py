@@ -1,52 +1,40 @@
 #!/usr/bin/python3
-
-'''
-Reads stdin line by line and computes metrics
-'''
 import sys
 
-if __name__ == "__main__":
+def print_stats(total_size, status_counts):
+    """Print the accumulated metrics."""
+    print(f"File size: {total_size}")
+    for code in sorted(status_counts.keys()):
+        if status_counts[code] > 0:
+            print(f"{code}: {status_counts[code]}")
 
-    status_codes = {200: 0, 301: 0, 400: 0, 401: 0,
-                    403: 0, 404: 0, 405: 0, 500: 0}
-    file_size = [0]
-    count = 1
+total_size = 0
+status_counts = {200: 0, 301: 0, 400: 0, 401: 0, 403: 0, 404: 0, 405: 0, 500: 0}
+line_count = 0
 
-    def print_stats():
-        '''
-        Prints file size and stats for every 10 loops
-        '''
-        print('File size: {}'.format(file_size[0]))
-
-        for code in sorted(status_codes.keys()):
-            if status_codes[code] != 0:
-                print('{}: {}'.format(code, status_codes[code]))
-
-    def parse_stdin(line):
-        '''
-        Checks the stdin for matches
-        '''
+try:
+    for line in sys.stdin:
+        parts = line.split()
+        if len(parts) < 7:
+            continue  
         try:
-            line = line[:-1]
-            word = line.split(' ')
+            file_size = int(parts[-1])
+            status_code = int(parts[-2])
+        except ValueError:
+            continue  
 
-            file_size[0] += int(word[-1])
+        
+        total_size += file_size
 
-            status_code = int(word[-2])
+        if status_code in status_counts:
+            status_counts[status_code] += 1
 
-            if status_code in status_codes:
-                status_codes[status_code] += 1
-        except BaseException:
-            pass
+        line_count += 1
 
-    try:
-        for line in sys.stdin:
-            parse_stdin(line)
+        if line_count % 10 == 0:
+            print_stats(total_size, status_counts)
 
-            if count % 10 == 0:
-                print_stats()
-            count += 1
-    except KeyboardInterrupt:
-        print_stats()
-        raise
-    print_stats()
+except KeyboardInterrupt:
+    pass
+finally:
+    print_stats(total_size, status_counts)
