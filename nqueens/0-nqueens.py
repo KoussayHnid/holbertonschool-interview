@@ -1,37 +1,29 @@
 #!/usr/bin/python3
-""" Program that solves the N queens problem."""
-
 import sys
 
-
-def is_safe(queen_positions, row, col):
-    """Checks if the position is safe for a new queen"""
+def is_safe(board, row, col):
+    # Check this column on upper side
     for i in range(row):
-        if queen_positions[i] == col or \
-           queen_positions[i] - i == col - row or \
-           queen_positions[i] + i == col + row:
+        if board[i] == col or \
+           board[i] - i == col - row or \
+           board[i] + i == col + row:
             return False
     return True
 
-
-def solve_nqueens(size, row, queen_positions):
-    """ Solves the N Queens problem recursively"""
-    if row == size:
-        print_solution(queen_positions)
+def solve_nqueens(board, row, n):
+    if row == n:
+        solutions.append(board.copy())
         return
-    for col in range(size):
-        if is_safe(queen_positions, row, col):
-            queen_positions[row] = col
-            solve_nqueens(size, row + 1, queen_positions)
+    for col in range(n):
+        if is_safe(board, row, col):
+            board[row] = col
+            solve_nqueens(board, row + 1, n)
 
-
-def print_solution(queen_positions):
-    """ Prints one solution from the list of queen positions"""
-    solution = []
-    for row, col in enumerate(queen_positions):
-        solution.append([row, col])
-    print(solution)
-
+def nqueens(n):
+    global solutions
+    solutions = []
+    board = [-1] * n  # Initialize board with -1 (no queen placed)
+    solve_nqueens(board, 0, n)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -48,5 +40,8 @@ if __name__ == "__main__":
         print("N must be at least 4")
         sys.exit(1)
 
-    queen_positions = [-1] * N
-    solve_nqueens(N, 0, queen_positions)
+    nqueens(N)
+
+    for solution in solutions:
+        formatted_solution = [[i, solution[i]] for i in range(len(solution))]
+        print(formatted_solution)
