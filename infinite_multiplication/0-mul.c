@@ -1,108 +1,102 @@
-#include "holberton.h"
-#include <stdlib.h>
-#include <stddef.h>
-#include <string.h>
-#include <unistd.h>
+#include "main.h"
 
 /**
- * mul - multiplies two positive numbers
- * @num1: the first number
- * @num2: the second number
- *
- * Return: void (no return value)
+ * checknumber - Verify that a string is numeric
+ * @string: A string
+ * Return: 1 if valid, 0 if invalid
  */
-void mul(char *num1, char *num2)
+int checknumber(char *string)
 {
-	int len1, len2, i, j, carry;
-	int *result;
+	int i;
+	char c;
 
-	len1 = _strlen(num1);
-	len2 = _strlen(num2);
-
-	result = calloc(len1 + len2, sizeof(int));
-	if (result == NULL)
+	for (i = 0; string[i]; i++)
 	{
-		write(STDERR_FILENO, "Error\n", 6);
-		exit(98);
-	}
-
-	for (i = len1 - 1; i >= 0; i--)
-	{
-		carry = 0;
-		for (j = len2 - 1; j >= 0; j--)
-		{
-			int tmp = (num1[i] - '0') * (num2[j] - '0') + result[i + j + 1] + carry;
-
-			result[i + j + 1] = tmp % 10;
-			carry = tmp / 10;
-		}
-		result[i + j + 1] = carry;
-	}
-
-	i = 0;
-	while (i < len1 + len2 && result[i] == 0)
-		i++;
-
-	if (i == len1 + len2)
-		_putchar('0');
-	else
-		for (; i < len1 + len2; i++)
-			_putchar(result[i] + '0');
-	_putchar('\n');
-
-	free(result);
-}
-
-/**
- * _strlen - calculates the length of a string
- * @str: the string to calculate the length of
- *
- * Return: the length of the string
- */
-int _strlen(char *str)
-{
-	int count = 0;
-
-	while (*str)
-	{
-		count++;
-		str++;
-	}
-	return (count);
-}
-
-/**
- * _isdigit - checks if a string contains only digits
- * @str: the string to check
- *
- * Return: 1 if all characters are digits, otherwise 0
- */
-int _isdigit(char *str)
-{
-	while (*str)
-	{
-		if (*str < '0' || *str > '9')
+		c = string[i];
+		if (c < '0' || c > '9')
 			return (0);
-		str++;
 	}
+
 	return (1);
 }
 
 /**
- * main - Entry point for the program.
- * @argc: The number of arguments passed to the program.
- * @argv: An array of pointers to the arguments.
+ * print_string - Prints a string
  *
- * Return: On success, returns 0.
+ * @string: A string
+ */
+void print_string(char *string)
+{
+	int i;
+
+	for (i = 0; string[i]; i++)
+		_putchar(string[i]);
+	_putchar('\n');
+}
+
+/**
+ * _strlen - Calculates the length of a string
+ *
+ * @str: A string
+ *
+ * Return: The number of bytes in the string excluding the null byte
+ */
+size_t _strlen(char *str)
+{
+	size_t i = 0;
+
+	while (str[i++])
+		continue;
+
+	return (--i);
+}
+
+/**
+ * main - multiply two large integers and prints the result
+ * @argc: Command line argument count
+ * @argv: Command line arguments
+ * Return: 1 on success, 98 on failure.
  */
 int main(int argc, char **argv)
 {
-	if (argc != 3 || !_isdigit(argv[1]) || !_isdigit(argv[2]))
+	char *a, *b, digit_a, digit_b, sum;
+	char *result;
+	int i = 0, j;
+	size_t result_length, a_length, b_length, k;
+
+	if (argc != 3 || !checknumber(argv[1]) || !checknumber(argv[2]))
 	{
-		write(STDERR_FILENO, "Error\n", 6), exit(98);
+		print_string("Error");
+		exit(98);
 	}
-
-	mul(argv[1], argv[2]);
-
-	return (0);
+	a = argv[1];
+	b = argv[2];
+	a_length = _strlen(a);
+	b_length = _strlen(b);
+	result_length = a_length + b_length;
+	result = (char *)malloc(result_length);
+	while ((size_t)i < result_length)
+		result[i++] = 0;
+	for (i = a_length - 1; i >= 0; i--)
+	{
+		digit_a = a[i] - '0';
+		for (j = b_length - 1; j >= 0; j--)
+		{
+			digit_b = b[j] - '0';
+			k = result_length - 1 - (b_length - j - 1) - (a_length - i - 1);
+			result[k] += digit_a * digit_b;
+			for (sum = result[k]; sum > 9; sum = result[k])
+			{
+				result[k--] = sum % 10;
+				result[k] += sum / 10;
+			}
+		}
+	}
+	for (i = k; (size_t)i < result_length; i++)
+		result[i] += '0';
+	while (result[k] == '0' && k < result_length - 1)
+		k++;
+	print_string(result + k);
+	free(result);
+	return (EXIT_SUCCESS);
 }
