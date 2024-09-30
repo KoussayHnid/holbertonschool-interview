@@ -1,91 +1,43 @@
 #include "binary_trees.h"
-
-
 /**
- * binary_tree_node - Creates a binary tree node
- * @parent: Parent node
- * @value: Value of node
+ * ArrayToAVL - sort array
  *
- * Return: Create new Binary tree
+ * @array: sorted array to be converted to a binary tree.
+ * @start: start node.
+ * @end: end node.
+ * @parent: parent node.
+ * Return: AVL tree
  */
 
-binary_tree_t *binary_tree_node(binary_tree_t *parent, int value)
+avl_t *ArrayToAVL(int *array, int start, int end, avl_t *parent)
 {
-	binary_tree_t *new_node = malloc(sizeof(binary_tree_t));
+	avl_t *root;
+	int mid;
 
-	if (new_node == NULL)
-	{
+	if (start > end)
 		return (NULL);
-	}
+	mid = (start + end) / 2;
 
-	/*Assign data to this node*/
-	new_node->n = value;
-	new_node->parent = parent;
-	new_node->left = NULL;
-	new_node->right = NULL;
-	return (new_node);
+	root = malloc(sizeof(avl_t));
+	if (root == NULL)
+		return (NULL);
+	root->n = array[mid];
+	root->parent = parent;
+	root->left = ArrayToAVL(array, start, mid - 1, root);
+	root->right = ArrayToAVL(array, mid + 1, end, root);
+	return (root);
+
 }
-
 /**
-* insert_sorted_array - Inserts sorted array to a Binary Tree
-* @array: Pointer to first element of sorted array
-* @min: Minimum value
-* @max: Maximum Value
-*
-* Return: Pointer to root node of AVL Tree, or Null on failure
-*/
-avl_t *insert_sorted_array(int *array, int min, int max)
-{
-	int medium_value;
-	avl_t *tree;
-	binary_tree_t *parent = NULL;
-
-	if (min > max)
-	{
-		return (NULL);
-	}
-
-	medium_value = (min + max) / 2;
-
-	tree = binary_tree_node(parent, array[medium_value]);
-
-	if (tree == NULL)
-	{
-		return (NULL);
-	}
-
-	tree->left = insert_sorted_array(array, min, medium_value - 1);
-	tree->right = insert_sorted_array(array, medium_value + 1, max);
-
-	if (tree->left)
-	{
-		tree->left->parent = tree;
-	}
-
-	if (tree->right)
-	{
-		tree->right->parent = tree;
-	}
-
-	return (tree);
-}
-
-/**
-* sorted_array_to_avl - Builds an AVL Tree from a sorted array
-* @array: Pointer to first element of sorted array
-* @size: Number of elements in array
-*
-* Return: Pointer to root node of AVL Tree, or Null on failure
-*/
-
+ * sorted_array_to_avl - Prints a binary tree
+ *
+ * @array: sorted array to be converted to a binary tree
+ * @size: size of the array
+ * Return: AVL tree
+ */
 avl_t *sorted_array_to_avl(int *array, size_t size)
 {
-	avl_t *root = NULL;
-
 	if (array == NULL)
 		return (NULL);
-
-	root = insert_sorted_array(array, 0, size - 1);
-
-	return (root);
+	return (ArrayToAVL(array, 0, size - 1, NULL));
 }
