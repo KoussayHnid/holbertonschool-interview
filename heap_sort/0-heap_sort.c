@@ -1,113 +1,68 @@
 #include "sort.h"
-
-void sift_down(int *array, size_t start, size_t end, size_t size);
-void swap_elem(int *arr, size_t size, int *a, int *b);
-
-
 /**
- * sift_down - Builds heap form bottom up
- *
- * @array: List to be sorted
- * @start: Subscript of the root ot the heap
- * @size: Size of array
- * @end: Subscript of the last element of the heap
+ * swap - swap element.
+ * @a: first elemnt.
+ * @b: seconde element.
  */
-void sift_down(int *array, size_t start, size_t end, size_t size)
+void swap(int *a, int *b)
 {
-	size_t root, child, swap;
 
-	root = start;
+	int temp = *a;
 
-	while ((root * 2) + 1 <= end)
-	{
-		/* Subscript of left child */
-		child = (root * 2) + 1;
-		swap = root;
+	*a = *b;
 
-		if (array[swap] < array[child])
-		{
-			/* Swap root and left child */
-			swap = child;
-		}
-		if (child + 1 <= end && array[swap] < array[child + 1])
-		{
-			/* Swap root with right child */
-			swap = child + 1;
-		}
-		/* If one child is greater than other */
-		if (swap != root)
-		{
-			swap_elem(array, size, &array[root], &array[swap]);
-			root = swap;
-		}
-		else
-		{
-			return;
-		}
-	}
+	*b = temp;
 }
-
-
 /**
- * heapify - Arranges heap so largest number is root
- * @array: array (for print)
- * @size: size of array (for print)
- */
-void heapify(int *array, size_t size)
-{
-	int start;
-
-	/* Last non-leaf */
-	start = (size / 2) - 1;
-
-	while (start >= 0)
-	{
-		sift_down(array, start, size - 1, size);
-		start--;
-	}
-}
-
-
-/**
- * heap_sort - Sort list in ascending order
- * @array: Array to be sorted
- * @size: Size of the array
- * Return: Void
+ * heap_sort - sorts an array using the sift-down heap sort algorithm
+ * @array: the array to be sorted
+ * @size: size of the array
  */
 void heap_sort(int *array, size_t size)
 {
-	size_t last;
+	int i, last;
 
-	if (!array || size < 2)
-	{
+	if (!array || size <= 1)
 		return;
-	}
-
-	last = size - 1;
-
-	heapify(array, size);
-
-	while (last > 0)
+	last = (int)size - 1;
+	for (last = (int)size - 1; last > 0; last--)
 	{
-		swap_elem(array, size, &array[last], &array[0]);
-		last--;
-		sift_down(array, 0, last, size);
+		for (i = last; i >= 0; i--)
+		{
+			heapify(array, (int)size, i, last);
+		}
+		swap(&array[0], &array[last]);
+		print_array((const int *)array, size);
 	}
 }
 
 /**
- * swap_elem - swap value of array elements
- * @array: array (for print)
- * @size: size of array (for print)
- * @a: pointer to array element
- * @b: pointer to array element
+ * heapify - recursively makes the array a max-heap
+ * @array: the array is treated as a complete binary tree
+ * @size: size of the array
+ * @parent: index of the parent node (it will be compared with its children)
+ * @last: index to mark the end of the unsorted part of the array
  */
-void swap_elem(int *array, size_t size, int *a, int *b)
+void heapify(int *array, int size, int parent, int last)
 {
-	int temp;
+	int left, right;
 
-	temp = *a;
-	*a = *b;
-	*b = temp;
-	print_array(array, size);
+	left = (parent * 2) + 1;
+	right = (parent * 2) + 2;
+	if (parent < 0 || parent >= size - 1)
+		return;
+	if (right <= last &&
+	(array[right] >= array[left] && array[right] > array[parent]))
+	{
+		swap(&array[parent], &array[right]);
+		print_array((const int *)array, (size_t)size);
+		heapify(array, size, right, last);
+	}
+	if ((left <= last &&
+	(right > last || array[left] > array[right])) && array[left] > array[parent])
+	{
+		swap(&array[parent], &array[left]);
+		print_array((const int *)array, (size_t)size);
+		heapify(array, size, left, last);
+	}
 }
