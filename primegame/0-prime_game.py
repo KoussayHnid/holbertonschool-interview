@@ -14,6 +14,7 @@ def sieve_of_eratosthenes(max_n):
                 primes[multiple] = False
     return primes
 
+
 def count_prime_moves(n, primes):
     """Count how many prime moves can be made in a game with n."""
     moves = 0
@@ -22,8 +23,10 @@ def count_prime_moves(n, primes):
         if primes[i] and nums[i]:  # if the number is a prime and still available
             moves += 1
             for multiple in range(i, n + 1, i):
-                nums[multiple] = False  # Mark prime and its multiples as removed
+                # Mark prime and its multiples as removed
+                nums[multiple] = False
     return moves
+
 
 def isWinner(x, nums):
     """Determine the winner of each round."""
@@ -39,7 +42,8 @@ def isWinner(x, nums):
     # Simulate each round
     for n in nums:
         moves = count_prime_moves(n, primes)
-        # Maria starts first, so if moves are odd, Maria wins, otherwise Ben wins
+        # Maria starts first, so if moves are odd, Maria wins, otherwise Ben
+        # wins
         if moves % 2 == 1:
             maria_wins += 1
         else:
