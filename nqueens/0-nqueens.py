@@ -1,10 +1,11 @@
 #!/usr/bin/python3
-"""The N queens puzzle is the challenge of placing N non-attacking queens 
+"""The N queens puzzle is the challenge of placing N non-attacking queens
 on an N×N chessboard
  Write a program that solves the N queens problem
 """
 
 import sys
+
 
 def is_valid(board, row, col):
     """Check if a queen can be placed at board[row][col]"""
@@ -18,6 +19,7 @@ def is_valid(board, row, col):
 
     return True
 
+
 def solve_nqueens(N, row, board, solutions):
     """Recursive function to solve the N Queens problem"""
     if row == N:
@@ -30,6 +32,7 @@ def solve_nqueens(N, row, board, solutions):
             board[row] = col
             solve_nqueens(N, row + 1, board, solutions)
 
+
 def nqueens(N):
     """Solve the N Queens problem and print all solutions"""
     board = [-1] * N
@@ -37,6 +40,7 @@ def nqueens(N):
     solve_nqueens(N, 0, board, solutions)
     for solution in solutions:
         print(solution)
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
