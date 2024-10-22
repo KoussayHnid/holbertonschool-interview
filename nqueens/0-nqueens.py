@@ -1,73 +1,56 @@
 #!/usr/bin/python3
+"""The N queens puzzle is the challenge of placing N non-attacking queens 
+on an N×N chessboard
+ Write a program that solves the N queens problem
 """
-The N queens puzzle
-"""
-
 
 import sys
 
-if len(sys.argv) != 2:
-    print("Usage: nqueens N")
-    exit(1)
-try:
-    int(sys.argv[1])
-except Exception:
-    print("N must be a number")
-    exit(1)
-if int(sys.argv[1]) < 4:
-    print("N must be at least 4")
-    exit(1)
-if not isinstance(int(sys.argv[1]), int):
-    print("N must be a number")
-    exit(1)
+def is_valid(board, row, col):
+    """Check if a queen can be placed at board[row][col]"""
+    for i in range(row):
+        if board[i] == col:
+            return False
 
-n = int(sys.argv[1])
+    for i in range(row):
+        if board[i] - i == col - row or board[i] + i == col + row:
+            return False
 
+    return True
 
-def is_valid_state(state, n):
-    return len(state) == n
-
-
-def get_candidates(state, n):
-    if not state:
-        return range(n)
-
-    position = len(state)
-    candidates = set(range(n))
-    for row, col in enumerate(state):
-        candidates.discard(col)
-        dist = position - row
-        candidates.discard(col + dist)
-        candidates.discard(col - dist)
-    return candidates
-
-
-def search(state, solutions, n):
-    if is_valid_state(state, n):
-        state_string = state_to_string(state)
-        solutions.append(state_string)
+def solve_nqueens(N, row, board, solutions):
+    """Recursive function to solve the N Queens problem"""
+    if row == N:
+        solution = [[i, board[i]] for i in range(N)]
+        solutions.append(solution)
         return
 
-    for candidate in get_candidates(state, n):
-        state.append(candidate)
-        search(state, solutions, n)
-        state.pop()
+    for col in range(N):
+        if is_valid(board, row, col):
+            board[row] = col
+            solve_nqueens(N, row + 1, board, solutions)
 
-
-def solveNQueens(n):
+def nqueens(N):
+    """Solve the N Queens problem and print all solutions"""
+    board = [-1] * N
     solutions = []
-    state = []
-    search(state, solutions, n)
-    return solutions
+    solve_nqueens(N, 0, board, solutions)
+    for solution in solutions:
+        print(solution)
 
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: nqueens N")
+        sys.exit(1)
 
-def state_to_string(state):
-    res = []
+    try:
+        N = int(sys.argv[1])
+    except ValueError:
+        print("N must be a number")
+        sys.exit(1)
 
-    for x, y in enumerate(state):
-        res.append([x, y])
-    return res
+    if N < 4:
+        print("N must be at least 4")
+        sys.exit(1)
 
-
-for solution in solveNQueens(n):
-    print(solution)
+    nqueens(N)
